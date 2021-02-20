@@ -1,27 +1,35 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import Conversations from "./Conversations";
+import Conversations from "./ConversationsContainer";
+import Messages from "./MessagesContainer";
+import { REQUEST_OPTION } from "./constants";
+
+const AppView = styled.div`
+  display: flex;
+  flex-direction: row;
+  padding: 24px;
+`;
 
 const AppContainer = () => {
+  const [conversations, setConversations] = useState([]);
+  const [selectedConvo, setSelectedConvo] = useState(null);
+
   useEffect(() => {
-    fetch('fetch("http://localhost:3001/conversations", requestOptions)');
+    fetch("http://localhost:3001/conversations", REQUEST_OPTION)
+      .then((response) => response.json())
+      .then((data) => setConversations(data))
+      .then(() => setSelectedConvo(conversations));
   }, []);
 
   return (
-    <AppContainerStyle>
-      <h1>Conversations</h1>
-      <Conversations />
-    </AppContainerStyle>
+    <AppView>
+      <Conversations
+        conversations={conversations}
+        onSelect={setSelectedConvo}
+      />
+      <Messages converstaionId={selectedConvo} />
+    </AppView>
   );
 };
-
-const AppContainerStyle = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border: 1px solid;
-  height: 50;
-  width: 50;
-`;
 
 export default AppContainer;
