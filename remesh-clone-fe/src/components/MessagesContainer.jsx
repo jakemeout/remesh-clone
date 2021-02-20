@@ -1,53 +1,65 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import ConversationForm from "../forms/ConversationForm";
-import Searchbar from "./Searchbar";
-import { REQUEST_OPTION } from "./constants";
+import { GET_REQUEST_OPTION } from "../constants";
+import Form from "./Form";
 
-const MessagesContainer = ({ converstaionId }) => {
+const MessagesContainer = ({ conversationId }) => {
   const [messages, setMessages] = useState([]);
-  const [thoughts, setThoughts] = useState({});
-
+  const currTime = new Date().toISOString();
   useEffect(() => {
-    if (converstaionId > 0) {
+    if (conversationId > 0) {
       fetch(
-        `http://localhost:3001/messages/conversation/${converstaionId}`,
-        REQUEST_OPTION
+        `http://localhost:3001/messages/conversation/${conversationId}`,
+        GET_REQUEST_OPTION
       )
         .then((response) => response.json())
-        .then((data) => setMessages(data));
-    }
-  }, [converstaionId]);
-
-  useEffect(() => {
-    if (!messages || !messages.length) return;
-    messages.forEach((msg) => {
-      fetch(`http://localhost:3001/thoughts/message/${msg.id}`, REQUEST_OPTION)
-        .then((response) => response.json())
-        .then((data) => {
-          const updatedThoughts = { ...thoughts, [msg.id]: data };
-          setThoughts(updatedThoughts);
+        .then((messageData) => {
+          let newMessages = [...messageData];
+          console.log("###", messageData);
+          if (!messageData.length) {
+            setMessages(newMessages);
+          } else {
+            (messageData || []).forEach((msg, i) => {
+              fetch(
+                `http://localhost:3001/thoughts/message/${msg.id}`,
+                GET_REQUEST_OPTION
+              )
+                .then((response) => response.json())
+                .then((data) => {
+                  newMessages[i] = { ...msg, thoughts: data };
+                  setMessages(newMessages);
+                });
+            });
+          }
         });
-    });
-  }, [messages]);
+    }
+  }, [conversationId]);
 
   return (
-    <div>
+    <div data-testid="messages-container">
       {messages.map((msg) => {
-        const thoughtsAssociated =
-          (msg.id && thoughts && thoughts[msg.id]) || [];
-        console.log("==>", msg.id, thoughtsAssociated);
         return (
           <div>
             <label>{msg.text}</label>
             <ul>
-              {thoughtsAssociated.map((thought) => (
-                <li>{thought.text}</li>
+              {(msg.thoughts || []).map((thought) => (
+                <li key={thought.id}>{thought.text}</li>
               ))}
+              <li>
+                <Form
+                  label={"New thought"}
+                  endpoint={"thoughts"}
+                  options={{ message_id: msg.id, date_sent: currTime }}
+                />
+              </li>
             </ul>
           </div>
         );
       })}
+      <Form
+        label={"New message"}
+        endpoint={"messages"}
+        options={{ conversation_id: conversationId, date_sent: currTime }}
+      />
     </div>
   );
 };

@@ -1,15 +1,13 @@
-import Navigation from '../src/components/Navigation'
-import AppContainer from '../src/components/AppContainer'
+import Navigation from "../src/components/Navigation";
+import AppContainer from "../src/components/AppContainer";
 
 function App() {
   return (
     <>
-    <Navigation />
-    <AppContainer />
+      <Navigation />
+      <AppContainer />
     </>
   );
 }
-
-
 
 export default App;

@@ -1,29 +1,22 @@
 import React from "react";
 import logo from "../assets/images/RemeshLogo.png";
+import styled from "styled-components";
 
 const Navigation = () => {
   return (
-    <>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-start",
-          borderBottom: "1px solid",
-          paddingBottom: "5px",
-        }}
-      >
-        <img src={logo} alt="Logo" />
+    <NavStyle>
+      <div data-testid="navigation-container">
+        <img src={logo} alt="Logo" style={{ width: "50%", height: "20%" }} />
       </div>
-      <div
-        style={{
-          display: "flex",
-          marginTop: "5%",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      ></div>
-    </>
+    </NavStyle>
   );
 };
+
+const NavStyle = styled.div`
+  display: "flex",
+  justifyContent: "flex-start",
+  borderBottom: "1px solid",
+  paddingBottom: "5px",
+`;
 
 export default Navigation;
